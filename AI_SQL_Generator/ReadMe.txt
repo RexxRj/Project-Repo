@@ -1,0 +1,1 @@
+Trying to create a sql generator using langchain and gemini ai.

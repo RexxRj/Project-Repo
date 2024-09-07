@@ -20,8 +20,23 @@ llm = ChatGoogleGenerativeAI(
 )
 
 chunk_size = 10**6  # For example, 1 million rows per chunk
-csv_file = "D:/projects/New_Project/sttm.csv"
+file_path = "D:\Github\Projects\AI_SQL_Generator\sttm.xlsx"
+
+all_sheets = pd.read_excel(file_path, sheet_name=None)
+for sheet_name, df in all_sheets.items():
+    print(f'Sheet Name: {sheet_name}')
+    print(df.head())  # Display the first few rows of each sheet
 
 
-for chunk in pd.read_csv(csv_file, chunksize=chunk_size):
-    print(chunk)
+
+# for chunk in pd.read_csv(csv_file, chunksize=chunk_size):
+#     print(chunk)
+
+# def main(df):
+    
+#     transformations = []
+#     for index, row in df.iterrows():
+#         transformations.append(
+#             f"For target column '{row['target_column']}', transform '{row['source_column']}' from table '{row['source_table']}' "
+#             f"using transformation logic '{row['transformation_logic']}' (source datatype: {row['source_datatype']}, target datatype: {row['target_datatype']})."
+#         )
