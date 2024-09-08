@@ -2,3 +2,4 @@
 ## Projects
 
 1. Simple Text Editor using FLTK
+2. AI SQL Generator
