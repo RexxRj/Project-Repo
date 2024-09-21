@@ -74,7 +74,7 @@ h1 {
 .between {
     font-size: 1.4rem;
     position: absolute;
-    top: 2rem;
+    top: 10rem;
     right: 2rem;
 }
 
@@ -119,3 +119,66 @@ h1 {
 .label-score {
     margin-bottom: 2rem;
 }
+
+.info {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+}
+
+.modal {
+    position: absolute;
+    top: 14rem;
+    right: 2rem;
+    /* transform: translate(-50%, -50%); */
+    width: 40rem;
+    height: 12rem;
+    font-size: 1rem;
+    font-family: inherit;
+    color: #111;
+    background-color: white;
+    padding: 1rem;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 1.4rem;
+    
+    /* box-shadow: 0 3rem 5rem rgba(0, 0, 0, 0.3);
+    z-index: 10; */
+  }
+
+  .hidden {
+    display: none;
+  }
+  
+  h2 {
+    margin-bottom: 1rem;
+  }
+
+  /* .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+    z-index: 5;
+  } */
+
+  .close-modal {
+    position: absolute;
+    top: 0rem;
+    right: 1rem;
+    font-size: 3rem;
+    color: #333;
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+  
+  .icon {
+
+    display: inline-block;
+    font-size: 2rem;
+    
+  }
