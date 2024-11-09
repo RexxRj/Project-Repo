@@ -84,4 +84,36 @@ const displayMovements = function(movements) {
 
 };
 
+const calcDisplayBalance = function(movements){
+  const balance = movements.reduce((acc,mov) => acc+mov,0);
+  labelBalance.textContent = `${balance}€`;
+};
+
+const calcDisplaySummary = function(movements){
+
+  const incomes = movements.filter(mov => mov>0).reduce((acc,mov) => acc+mov,0);
+  const out = movements.filter(mov =>mov<0).reduce((acc,mov) => acc+mov,0);
+  const interest = movements.filter(mov=>mov>0).map(mov=> mov*1.2/100)
+                    .filter(mov=> mov>=1?mov:0).reduce((acc,mov) => acc+mov,0);
+  
+  labelSumIn.textContent = `${incomes}€`;
+  labelSumOut.textContent = `${Math.abs(out)}€`;                  
+  labelSumInterest.textContent = `${interest}€`;
+}
+
+const createUsernames = function(accs) {
+
+  accs.forEach(function(acc){
+    acc.username = acc.owner
+                    .toLowerCase()
+                    .split(' ')
+                    .map(name => name[0])
+                    .join('')
+  });
+};
+
+createUsernames(accounts);
 displayMovements(account1.movements);
+calcDisplayBalance(account1.movements);
+calcDisplaySummary(account1.movements);
+console.log(accounts);
