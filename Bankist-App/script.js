@@ -84,22 +84,32 @@ const displayMovements = function(movements) {
 
 };
 
-const calcDisplayBalance = function(movements){
-  const balance = movements.reduce((acc,mov) => acc+mov,0);
-  labelBalance.textContent = `${balance}€`;
+const calcDisplayBalance = function(acc){
+  acc.balance = acc.movements.reduce((acc,mov) => acc+mov,0);
+  labelBalance.textContent = `${acc.balance}€`;
 };
 
-const calcDisplaySummary = function(movements){
+const calcDisplaySummary = function(acc){
 
-  const incomes = movements.filter(mov => mov>0).reduce((acc,mov) => acc+mov,0);
-  const out = movements.filter(mov =>mov<0).reduce((acc,mov) => acc+mov,0);
-  const interest = movements.filter(mov=>mov>0).map(mov=> mov*1.2/100)
+  const incomes = acc.movements.filter(mov => mov>0).reduce((acc,mov) => acc+mov,0);
+  const out = acc.movements.filter(mov =>mov<0).reduce((acc,mov) => acc+mov,0);
+  const interest = acc.movements.filter(mov=>mov>0).map(mov=> (mov*acc.interestRate)/100)
                     .filter(mov=> mov>=1?mov:0).reduce((acc,mov) => acc+mov,0);
   
   labelSumIn.textContent = `${incomes}€`;
   labelSumOut.textContent = `${Math.abs(out)}€`;                  
-  labelSumInterest.textContent = `${interest}€`;
+  labelSumInterest.textContent = `${interest.toFixed(2)}€`;
 }
+
+const UpdateUI = function(acc)
+{
+  //Display Movements
+  displayMovements(acc.movements);
+  //Display balance
+  calcDisplayBalance(acc);
+  //Display summary
+  calcDisplaySummary(acc);
+};
 
 const createUsernames = function(accs) {
 
@@ -113,7 +123,51 @@ const createUsernames = function(accs) {
 };
 
 createUsernames(accounts);
-displayMovements(account1.movements);
-calcDisplayBalance(account1.movements);
-calcDisplaySummary(account1.movements);
-console.log(accounts);
+
+let currentAccount;
+//Event handler
+btnLogin.addEventListener('click', function(e) {
+  
+  e.preventDefault();
+
+  currentAccount = accounts.find(acc => acc.username === inputLoginUsername.value);
+
+  if(currentAccount?.pin === Number(inputLoginPin.value)){
+
+    //clear input fields
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur();
+    inputLoginUsername.blur();
+
+    //Display UI and message
+    labelWelcome.textContent = `Welcome, ${currentAccount.owner.split(' ')[0]}`;
+    containerApp.style.opacity = 100;
+    UpdateUI(currentAccount);
+
+
+  }
+  else{
+    labelWelcome.textContent = `Invalid Credentials, Log in to get started`;
+    containerApp.style.opacity = 0;
+  } 
+});
+
+btnTransfer.addEventListener('click', function(e){
+  e.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const receiverAcc = accounts.find(acc => acc.username === inputTransferTo.value);
+
+  inputTransferAmount.value = inputTransferTo.value = '';
+  inputTransferTo.blur();
+  inputTransferAmount.blur();
+
+  if(amount > 0 && receiverAcc && currentAccount.balance >= amount && receiverAcc?.username !== currentAccount.username)
+  {
+    currentAccount.movements.push(-amount);
+    receiverAcc.movements.push(amount);
+
+    //update UI
+    UpdateUI(currentAccount);
+  }
+});
+
