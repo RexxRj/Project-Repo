@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse,HttpResponseNotFound, HttpResponseRedirect
+from django.http import Http404,HttpResponse,HttpResponseNotFound, HttpResponseRedirect
 from django.urls import reverse
+# from django.template.loader import render_to_string 
 
 # Create your views here.
 
@@ -12,23 +13,26 @@ monthly_challenges = {
     "may": "Walk 10 kms everyday",
     "june": "learn django for 20 mins",
     "july": "learn django for 20 mins",
-    "august": "Eat no meat for the month",
+    "august": None,
     "september": "Walk 10 kms everyday",
     "october": "learn django for 20 mins",
     "november": "Eat no meat for the month",
-    "december": "Walk 10 kms everyday"
+    "december": None
 }
 
 def index(request):
     try:
-        response_text = ""
-        for key in monthly_challenges.keys():
-            link = reverse("month-challenge",args=[key])
-            response_text+= f"<li><a href = '{link}'>{key.capitalize()}</a></li>\n"
+        months = list(monthly_challenges.keys())
         
-        response_text = f"<ul>{response_text}</ul>"
+        return render(request,"challenges/index.html",{ "months": months})
+        # response_text = ""
+        # for key in monthly_challenges.keys():
+        #     link = reverse("month-challenge",args=[key])
+        #     response_text+= f"<li><a href = '{link}'>{key.capitalize()}</a></li>\n"
         
-        return HttpResponse(response_text)
+        # response_text = f"<ul>{response_text}</ul>"
+        
+        # return HttpResponse(response_text)
     except Exception as e:
         return HttpResponseNotFound(e)
     
@@ -43,13 +47,20 @@ def monthly_challenge_by_number(request,month):
         return HttpResponseRedirect(redirect_path)
     except Exception as e:
         return HttpResponseNotFound(e)
+        #raise Http404()
 
 def monthly_challenge(request,month):
     try:
         assert month in monthly_challenges.keys(), f"<h2>Month doesn't exist</h2>"
         challenge_text = monthly_challenges[month]
-        challenge_text = f"<h2>{challenge_text}</h2>"    
-        return HttpResponse(challenge_text)
+        return render(request,"challenges/challenge.html",{
+            'text': challenge_text,
+            'month_name': month
+        })
+        # challenge_text = f"<h2>{challenge_text}</h2>"   
+        # response_data = render_to_string("challenges/challenge.html") 
+        # return HttpResponse(response_data)
 
     except Exception as e:
         return HttpResponseNotFound(e)
+        #raise Http404()
