@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -8,8 +9,9 @@
                 My Blog
             {% endblock title %}
         </title>
-        {% block css_syles %}
-        {% endblock css_syles %}
+        <link rel="stylesheet" href="{% static 'app.css' %}">
+        {% block css_files %}
+        {% endblock css_files %}
     </head>
     <body>
         {% block content %}
