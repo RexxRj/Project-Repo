@@ -1,0 +1,51 @@
+/* Style pagination container */
+.pagination {
+    margin: 20px 0;
+    font-size: 1.1rem;
+    list-style-type: none;
+    padding: 0;
+}
+
+/* Style individual page links */
+.page-link {
+    padding: 8px 16px;
+    background-color: transparent;  /* Remove background */
+    color: black;  /* Set text color to black */
+    text-decoration: none;  /* Remove underline */
+    transition: all 0.3s ease;
+}
+
+/* Remove borders around the links */
+.page-link, .page-item {
+    border: none;
+}
+
+/* Hover effect on page links */
+.page-link:hover {
+    background-color: #007bff;  /* Blue background on hover */
+    color: white;  /* White text on hover */
+}
+
+/* Style active page link */
+.page-item.active .page-link {
+    background-color: #007bff;  /* Blue background for active */
+    color: white;  /* White text for active page */
+}
+
+/* Style for disabled page link (e.g., previous/next on first/last page) */
+.page-item.disabled .page-link {
+    color: #6c757d;  /* Grey text for disabled links */
+    pointer-events: none;  /* Disable click on the link */
+}
+
+/* Add a little spacing between page items */
+.page-item {
+    margin-right: 5px;
+}
+
+
+.table-responsive{
+    margin-top: 20px;
+}
+
+

@@ -1,0 +1,31 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% block css_files %}
+    <link rel="stylesheet" href="{% static "expense/css/index.css" %}">
+{% endblock css_files %}
+{% block title %}
+    Expense Tracker
+{% endblock title %}
+{% block content %}
+    <section id="file-upload-form"
+             class="d-flex justify-content-center align-items-start">
+        <div class="card">
+            <div class="card-body text-center d-flex flex-column justify-content-center">
+                <h5 class="card-title mb-4">Upload Your Bank Statement Below!</h5>
+                <form action="{% url "index" %}"
+                      method="POST"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input class="form-control mb-3"
+                           type="file"
+                           id="bankstatement"
+                           name="bankstatement" />
+                    <button type="submit" class="btn btn-primary w-100">Submit</button>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

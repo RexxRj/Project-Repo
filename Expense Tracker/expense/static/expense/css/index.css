@@ -1,0 +1,39 @@
+/* Center the file upload form */
+#file-upload-form {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: flex-start; /* Align content to the top */
+  min-height: 100vh; /* Ensure the section takes the full height of the viewport */
+}
+
+/* Style for the card */
+#file-upload-form .card {
+  width: 400px;
+  height: 400px;
+  margin-top: 60px; /* Adjust this based on your navbar height */
+  background-color: white; /* Set the background of the card to white */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow to the card */
+}
+
+/* Card body style */
+#file-upload-form .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Distribute content between top and bottom */
+  text-align: center;
+  height: 100%;
+}
+
+/* Styling for the file input */
+#file-upload-form .form-control {
+  width: 80%; /* Adjust width */
+  height: 150px; /* Make the file input larger */
+  border-radius: 5px; /* Rounded corners */
+  display: inline-block;
+}
+
+/* Styling for the submit button */
+#file-upload-form .btn {
+  width: 75%; /* Make the button proportionate */
+  margin-top: 15px; /* Space between input and button */
+}
