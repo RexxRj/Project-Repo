@@ -5,6 +5,8 @@ from django.views import View
 from django.http import HttpResponseRedirect,Http404
 from django.urls import reverse
 from .process_file import processfile
+from django.db.models import Sum
+import json
 
 from .models import Expenses, MerchantCategory
 from .forms import CategoryForm
@@ -43,14 +45,14 @@ class AllTransactionsView(View):
         
         if pageno<1:
             return HttpResponseRedirect(reverse("transactions-page",args=[1]))
-        if pageno>lastpage:
+        if pageno>lastpage and lastpage!=0:
             return HttpResponseRedirect(reverse("transactions-page",args=[lastpage]))
         
         if pageno*20<total_txns:
             expenses = expenses[pageno*20-20:pageno*20+1]
         elif pageno*20-20 < total_txns:
             expenses = expenses[pageno*20-20:]
-        else:
+        elif total_txns>=20:
             expenses = expenses[total_txns-20:]
             
         if pageno-5<=0:
@@ -85,4 +87,38 @@ class AllTransactionsView(View):
         print(category.errors)
         return HttpResponseRedirect(reverse("transactions-page",args=[pageno]))
             
+    
+
+class DashboardView(View):
+    
+    def get(self,request):
+        
+        expense_data = (Expenses.objects.values('merchantobject__category')
+        .annotate(total_amount=Sum('txn_amount'))
+        .order_by('-total_amount'))
+        
+        balance_data = Expenses.objects.values('balance')
+        
+        categories = [item['merchantobject__category'] for item in expense_data if item['total_amount'] < 0]
+        amounts = [-item['total_amount'] for item in expense_data if item['total_amount'] < 0]
+        balances = [item['balance'] for item in balance_data]
+        num = [i for i in range(1,len(balances)+1)]
+        
+        categories = json.dumps(categories)
+        amounts = json.dumps([float(amount) for amount in amounts])
+        balances = json.dumps([float(balance) for balance in balances])
+        num = json.dumps(num)
+
+        
+        
+        context = {
+            "categories": categories,
+            "amounts": amounts,
+            "balances": balances,
+            "num": num
+        }
+        
+        return render(request,"expense/dashboard.html",context)
+    
+   
     

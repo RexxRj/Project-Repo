@@ -1,0 +1,31 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% block css_files %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'expense/js/dashboard.js' %}"></script>
+    <link rel="stylesheet" href="{% static "expense/css/dashboard.css" %}">
+{% endblock css_files %}
+{% block title %}
+    Dashboard
+{% endblock title %}
+{% block content %}
+    <h2>Transaction Summary</h2>
+    <div id="chart-data"
+         data-categories='{{ categories|safe }}'
+         data-amounts='{{ amounts|safe }}'
+         data-balances='{{ balances|safe }}'
+         data-num='{{ num }}'></div>
+    <section class="chart-container">
+        <div id='expenseSummary'>
+            <h4 class="center-text">Expense Summary</h4>
+            <canvas id="transactionPieChart" width="400" height="400"></canvas>
+        </div>
+        <div id='balanceChart'>
+            <h4 class="center-text">Balance Trend</h4>
+            <canvas id="transactionLineChart" width="800" height="400"></canvas>
+        </div>
+    </section>
+{% endblock content %}
