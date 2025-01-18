@@ -94,15 +94,19 @@ def savefile(data):
             
             merchantobj = AssignCategoryAI(row)
             
-            Expenses.objects.create(
-                txn_date = row['value_date'],
-                desc = row['desc'],
-                cheque_no=row['cheque_no'],
-                            txn_amount=row['amount'],
-                            balance=row['balance'],
-                            merchant=row['user'],
-                            merchantobject=merchantobj
-            )
+            _, created = Expenses.objects.get_or_create(
+                                txn_date=row['value_date'],
+                                desc=row['desc'],
+                                cheque_no=row['cheque_no'],
+                                txn_amount=row['amount'],
+                                balance=row['balance'],
+                                merchant=row['user'],  # Exclude merchantobject here
+                                defaults={'merchantobject': merchantobj}  # Set merchantobject only if a new record is created
+                            )
+            if created:
+                print("A new expense record was created.")
+            else:
+                print("The expense record already exists.")
         except Exception as e:
             print(f"Error saving row: {row}, Error: {e}")
     print("file data is saved.")
@@ -117,7 +121,7 @@ def processfile(file):
     data['value_date'] = pd.to_datetime(data['value_date'], errors='coerce').dt.strftime('%Y-%m-%d')
     data['txn_date'] = pd.to_datetime(data['txn_date'], errors='coerce')
     
-    data['user'] = data['desc'].apply(lambda x: x.split('/')[3] if 'transfer' in x.lower() and len(x.split('/'))>3 else x)
+    data['user'] = data['desc'].apply(lambda x: x.split('/')[3].lower().strip() if 'transfer' in x.lower() and len(x.split('/'))>3 else x)
     
     data['cheque_no'] = data['cheque_no'].apply(
         lambda x: next((word for word in x.split() if word.isdigit()), None) if pd.notnull(x) else None

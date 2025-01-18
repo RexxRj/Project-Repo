@@ -2,7 +2,7 @@ from django import forms
 
 from .models import MerchantCategory,Expenses
 
-class CategoryForm(forms.ModelForm):
+class AddCategoryForm(forms.ModelForm):
     
     new_category = forms.CharField(required=False)
     
@@ -29,3 +29,26 @@ class CategoryForm(forms.ModelForm):
             print("not working")
         
         return super().save(commit=commit)
+    
+class EditCategoryForm(forms.ModelForm):
+    
+    class Meta:
+        
+        model = MerchantCategory
+        fields = '__all__'
+    id = forms.IntegerField(widget=forms.HiddenInput())
+    
+    def save(self, commit = True):
+        
+        
+        pk = self.cleaned_data.get('id')
+        category = self.cleaned_data.get('category')
+        
+        if pk:
+            instance = MerchantCategory.objects.get(id=pk)
+            instance.category = category
+            if commit:
+                instance.save()  # Save the updated instance to the database
+            return instance
+        
+        return super().save(commit)

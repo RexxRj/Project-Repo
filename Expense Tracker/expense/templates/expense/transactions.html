@@ -11,6 +11,74 @@
 {% endblock title %}
 {% block content %}
     <section>
+        <nav class="transactions-navbar">
+            <div id="transactions-filters">
+                <form id="filter-form"
+                      action="{% url 'transactions-page' pageno %}"
+                      method="GET">
+                    {% csrf_token %}
+                    <!-- Filter by Merchant -->
+                    <div class="filter-item mb-3">
+                        <label for="merchant" class="form-label">Merchant</label>
+                        <select class="form-select" name="merchant" id="merchant">
+                            <option value="">All Merchants</option>
+                            {% for merchant in merchants %}
+                                <option value="{{ merchant.merchant }}"
+                                        {% if merchant.merchant == selected_merchant %}selected{% endif %}>
+                                    {{ merchant.merchant }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Filter by Category -->
+                    <div class="filter-item mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select" name="category" id="category">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category.category }}"
+                                        {% if category.category == selected_category %}selected{% endif %}>
+                                    {{ category.category }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Filter by Date Range -->
+                    <div class="filter-item mb-3">
+                        <label for="start_date" class="form-label">Start Date</label>
+                        <input type="date"
+                               class="form-control"
+                               name="start_date"
+                               value="{{ selected_start_date }}">
+                    </div>
+                    <div class="filter-item mb-3">
+                        <label for="end_date" class="form-label">End Date</label>
+                        <input type="date"
+                               class="form-control"
+                               name="end_date"
+                               value="{{ selected_end_date }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary filter-button">Apply</button>
+                </form>
+                <form action="{% url 'transactions-page' pageno %}" method='POST'>
+                    {% csrf_token %}
+                    <input type="hidden"  name="merchant" value="{{ selected_merchant }}">
+                    <input type="hidden"  name="category" value="{{ selected_category }}">
+                    <input type="hidden"  name="start_date" value="{{ selected_start_date }}">
+                    <input type="hidden"  name="end_date" value="{{ selected_end_date }}">
+                    <button type="submit"
+                            class="btn btn-danger filter-button"
+                            name="action"
+                            value="delete">Delete selection</button>
+                </form>
+            </div>
+            <div id="transactions-balance">
+                <h4>Current Balance:</h4>
+                <h2>{{ current_balance }}</h2>
+            </div>
+        </nav>
+    </section>
+    <section>
         <div class="table-responsive">
             <table class="table table-hover text-center text-nowrap">
                 <thead>
@@ -58,6 +126,7 @@
                                                         {{ category_dict.category }}
                                                     </button>
                                                     <input type="hidden" name="pk" value="{{ row.id }}">
+                                                    <input type="hidden" name="action" value="edit">
                                                 </li>
                                             {% endfor %}
                                         </form>
@@ -73,6 +142,7 @@
                                                        name="new_category"
                                                        placeholder="Add New?">
                                                 <input type="hidden" name="pk" value="{{ row.id }}">
+                                                <input type="hidden" name="action" value="edit">
                                             </form>
                                         </li>
                                     </ul>
