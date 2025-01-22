@@ -1,0 +1,181 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% block css_files %}
+    <link rel="stylesheet" href="{% static "expense/css/transactions.css" %}">
+{% endblock css_files %}
+{% block title %}
+    Transactions
+{% endblock title %}
+{% block content %}
+    <section>
+        <nav class="transactions-navbar">
+            <div id="transactions-filters">
+                <form id="filter-form"
+                      action="{% url 'transactions-page' pageno %}"
+                      method="GET">
+                    {% csrf_token %}
+                    <!-- Filter by Merchant -->
+                    <div class="filter-item mb-3">
+                        <label for="merchant" class="form-label">Merchant</label>
+                        <select class="form-select" name="merchant" id="merchant">
+                            <option value="">All Merchants</option>
+                            {% for merchant in merchants %}
+                                <option value="{{ merchant.merchant }}"
+                                        {% if merchant.merchant == selected_merchant %}selected{% endif %}>
+                                    {{ merchant.merchant }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Filter by Category -->
+                    <div class="filter-item mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select" name="category" id="category">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category.category }}"
+                                        {% if category.category == selected_category %}selected{% endif %}>
+                                    {{ category.category }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Filter by Date Range -->
+                    <div class="filter-item mb-3">
+                        <label for="start_date" class="form-label">Start Date</label>
+                        <input type="date"
+                               class="form-control"
+                               name="start_date"
+                               value="{{ selected_start_date }}">
+                    </div>
+                    <div class="filter-item mb-3">
+                        <label for="end_date" class="form-label">End Date</label>
+                        <input type="date"
+                               class="form-control"
+                               name="end_date"
+                               value="{{ selected_end_date }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary filter-button">Apply</button>
+                </form>
+                <form action="{% url 'transactions-page' pageno %}" method='POST'>
+                    {% csrf_token %}
+                    <input type="hidden"  name="merchant" value="{{ selected_merchant }}">
+                    <input type="hidden"  name="category" value="{{ selected_category }}">
+                    <input type="hidden"  name="start_date" value="{{ selected_start_date }}">
+                    <input type="hidden"  name="end_date" value="{{ selected_end_date }}">
+                    <button type="submit"
+                            class="btn btn-danger filter-button"
+                            name="action"
+                            value="delete">Delete selection</button>
+                </form>
+            </div>
+            <div id="transactions-balance">
+                <h4>Current Balance:</h4>
+                <h2>{{ current_balance }}</h2>
+            </div>
+        </nav>
+    </section>
+    <section>
+        <div class="table-responsive">
+            <table class="table table-hover text-center text-nowrap">
+                <thead>
+                    <tr>
+                        <th scope="col">Transaction Date</th>
+                        <th scope="col">Merchant</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Balance</th>
+                        <th scope="col">Category</th>
+                    </tr>
+                    {% for row in transactions %}
+                        <tr>
+                            <td>{{ row.txn_date }}</td>
+                            <td>{{ row.merchant }}</td>
+                            <td>
+                                {% if row.txn_amount < 0 %}
+                                    <span class="text-danger">
+                                        <i class="fas fa-caret-down me-1"></i><span>{{ row.txn_amount }}</span>
+                                    </span>
+                                {% else %}
+                                    <span class="text-success">
+                                        <i class="fas fa-caret-up me-1"></i><span>{{ row.txn_amount }}</span>
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>{{ row.balance }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <span class="d-flex align-items-center">{{ row.merchantobject.category }}</span>
+                                    <button type="button"
+                                            class="btn btn-default dropdown-toggle dropdown-toggle-split"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        <span class="visually-hidden">Toggle Dropdown</span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <form action="{% url "transactions-page" pageno %}" method="POST">
+                                            {% csrf_token %}
+                                            {% for category_dict in categories %}
+                                                <li>
+                                                    <button class="dropdown-item"
+                                                            type="submit"
+                                                            name="new_category"
+                                                            value="{{ category_dict.category }}">
+                                                        {{ category_dict.category }}
+                                                    </button>
+                                                    <input type="hidden" name="pk" value="{{ row.id }}">
+                                                    <input type="hidden" name="action" value="edit">
+                                                </li>
+                                            {% endfor %}
+                                        </form>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <form action="{% url "transactions-page" pageno %}" method="POST">
+                                                {% csrf_token %}
+                                                <input class="dropdown-item"
+                                                       id="addNewCategory"
+                                                       type="text"
+                                                       name="new_category"
+                                                       placeholder="Add New?">
+                                                <input type="hidden" name="pk" value="{{ row.id }}">
+                                                <input type="hidden" name="action" value="edit">
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </thead>
+            </table>
+        </div>
+        <nav aria-label="page-navigation">
+            <ul class="pagination">
+                <li class="page-item">
+                    <a class="page-link"
+                       href="{% url 'transactions-page' prevpage %}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% for no in range %}
+                    <li class="page-item {% if no == pageno %}active{% endif %}">
+                        <a class="page-link" href="{% url 'transactions-page' no %}">{{ no }}</a>
+                    </li>
+                {% endfor %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="{% url 'transactions-page' pageno|add:+10 %}"
+                       aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </section>
+    <script src="{% static 'expense/js/transactions.js' %}"></script>
+{% endblock content %}

@@ -1,0 +1,53 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% block css_files %}
+{% endblock css_files %}
+{% block title %}
+    Categories
+{% endblock title %}
+{% block content %}
+    <section id="categories-view">
+        <div class="table-responsive">
+            <table class="table table-hover text-center text-nowrap">
+                <thead>
+                    <tr>
+                        <th scope="col">Merchant</th>
+                        <th scope="col">Category</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    {% for row in categories %}
+                        {% if row.merchant != 'default' %}
+                            <tr>
+                                <td>{{ row.merchant }}</td>
+                                <form action="{% url "categories-page" %}" method='POST'>
+                                    {% csrf_token %}
+                                    <td>
+                                        <input type="text"
+                                               name="category"
+                                               class="form-control"
+                                               value="{{ row.category }}">
+                                        <input type="hidden" name="id" value="{{ row.id }}">
+                                        <input type="hidden" name="merchant" value="{{ row.merchant }}">
+                                    </td>
+                                    <td>
+                                        <button type="submit"
+                                                name="action"
+                                                value="save"
+                                                class="btn btn-sm btn-primary">Save</button>
+                                    </td>
+                                    <td>
+                                        <button type="submit" name="action" value="delete" class="btn btn-danger">Delete</button>
+                                    </td>
+                                </form>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </thead>
+            </table>
+        </div>
+    </section>
+{% endblock content %}

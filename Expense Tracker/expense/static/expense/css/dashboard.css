@@ -1,0 +1,38 @@
+.chart-container{
+    display: flex;
+    justify-content: space-around; /* Distribute space between the charts */
+    align-items: flex-start; /* Align items at the top */
+    width: 100%; /* Ensure the container takes up the full width */
+}
+
+#expenseSummary{
+    display: flex;
+
+
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Align items (text and chart) in the center horizontally */
+    justify-content: flex-start; /* Ensure alignment starts from the top */
+    width: 30%;
+    margin-top: 30px;
+}
+
+#balanceChart{
+    width: 55%;
+    display: flex;
+
+
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Align items (text and chart) in the center horizontally */
+    justify-content: flex-start; /* Ensure alignment starts from the top */
+    margin-top: 30px;
+}
+
+.center-text {
+    text-align: center; /* Center the text horizontally */
+    margin-bottom: 10px; /* Add spacing between the text and the chart */
+}
+
+h2{
+    margin-bottom: 50px;
+    text-align: center;
+}
