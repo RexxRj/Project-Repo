@@ -9,6 +9,9 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.xlsx
+*.env
+*.dbsqlite3
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -361,3 +364,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+Expense Tracker/db.sqlite3
