@@ -185,13 +185,45 @@ class DashboardView(View):
 
 class CategoriesView(View):
     
-    def get(self,request):
+    def get(self,request,pageno=None):
+        
+        if pageno==None:
+            return HttpResponseRedirect(reverse("categories-page",args=[1]))
         
         categories = MerchantCategory.objects.all()
+        total_txns = len(categories)
+        lastpage = int(total_txns/20)
         
-        return render(request,'expense/categories.html',{'categories':categories})
+        if pageno<1:
+            return HttpResponseRedirect(reverse("categories-page",args=[1]))
+        if pageno>lastpage and lastpage!=0:
+            return HttpResponseRedirect(reverse("categories-page",args=[lastpage]))
         
-    def post(self,request):
+        if pageno*20<total_txns:
+            categories = categories[pageno*20-20:pageno*20+1]
+        elif pageno*20-20 < total_txns:
+            categories = categories[pageno*20-20:]
+        elif total_txns>=20:
+            categories = categories[total_txns-20:]
+            
+        if pageno-5<=0:
+            pg_range = range(1,min(6,max(lastpage+1,2)))
+        elif pageno+5>=lastpage:
+            pageno = lastpage
+            pg_range = range(max(1,lastpage-4),lastpage+1)
+        else:
+            pg_range = range(pageno-4,pageno+1)
+        
+        prevpage = max(pageno-10,1)
+        
+        return render(request,'expense/categories.html',{
+            'categories':categories,
+            'pageno': pageno,
+            'range': pg_range,
+            'prevpage': prevpage,
+            })
+        
+    def post(self,request,pageno=None):
         
         if request.POST.get('action') == 'delete':
             
@@ -209,7 +241,7 @@ class CategoriesView(View):
             categoryform.save()
 
         
-        return HttpResponseRedirect(reverse("categories-page"))
+        return HttpResponseRedirect(reverse("categories-page",args=[pageno]))
         
         
             

@@ -23,7 +23,7 @@
                         {% if row.merchant != 'default' %}
                             <tr>
                                 <td>{{ row.merchant }}</td>
-                                <form action="{% url "categories-page" %}" method='POST'>
+                                <form action="{% url "categories-page" pageno %}" method='POST'>
                                     {% csrf_token %}
                                     <td>
                                         <input type="text"
@@ -49,5 +49,28 @@
                 </thead>
             </table>
         </div>
+        <nav aria-label="page-navigation">
+            <ul class="pagination">
+                <li class="page-item">
+                    <a class="page-link"
+                       href="{% url 'categories-page' prevpage %}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% for no in range %}
+                    <li class="page-item {% if no == pageno %}active{% endif %}">
+                        <a class="page-link" href="{% url 'categories-page' no %}">{{ no }}</a>
+                    </li>
+                {% endfor %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="{% url 'categories-page' pageno|add:+10 %}"
+                       aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </section>
 {% endblock content %}

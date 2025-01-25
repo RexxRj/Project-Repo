@@ -1,28 +1,7 @@
 from .models import Expenses, MerchantCategory
 import pandas as pd
-# import google.generativeai as genai
-# import os
-# from langchain_google_genai import ChatGoogleGenerativeAI
-# from langchain_core.prompts import ChatPromptTemplate
-# from langchain import LLMChain
-# from dotenv import load_dotenv
 
-
-# load_dotenv()
-
-# API_KEY = os.getenv("API_KEY")
-    
-# genai.configure(api_key=API_KEY)
-    
-# os.environ["GOOGLE_API_KEY"] = API_KEY
-    
-# llm = ChatGoogleGenerativeAI(
-#     model="gemini-1.5-pro",
-#     temperature=0,
-#     max_tokens=None,
-#     timeout=None,
-#     max_retries=2
-# )
+from .ml_models.ml_model_main import PredictModel, TrainModel
 
 def AssignCategoryAI(row):
     merchant = row['user'].lower().strip()
@@ -31,55 +10,23 @@ def AssignCategoryAI(row):
     
     if not merchantobj:
         
-        # try:
-        
-        #     categories = MerchantCategory.objects.values('category').distinct()
-        #     prompt = {
-        #     "role": "system",
-        #     "content": """You are a intelligent category assigning agent.
-        #     You take merchant name which can be any upi merchant transaction like 
-        #     food transactions, travel transactions, friends transactions etc.
-        #     You will assign correct category to the transaction from a list that is provided to you.
-        #     You will only return the category and nothing else.
-        #     """   
-        #     }
+        try:
+            predictmod = PredictModel(merchant)
+            prediction = predictmod.predict()
             
-        #     print(prompt)
-            
-        #     message1 = {"role": "user",
-        #         "content": f""" 
-        #         Merchant Name: {merchant},
-        #         Categories: {[x['category'] for x in categories]},
-        #         Please provide a one category for this merchant
-        #         """
-
-        #         }
-            
-        #     print(message1)
-            
-        #     chat_prompt = ChatPromptTemplate.from_messages([
-        #     (prompt['role'], prompt['content']),
-        #     (message1['role'], message1['content'])
-        #     ])
-            
-        #     prompt_chain = LLMChain(prompt=chat_prompt, llm=llm)
-            
-        #     print("running")
-            
-        #     category = prompt_chain.run({})
-            
-        #     print("category: ",category)
-            
-            
-        #     merchantobj,created = MerchantCategory.objects.get_or_create(
-        #             merchant=merchant,
-        #             category = category
-        #         )
-            
-        #     print("done")
-        # except Exception as e:
-        #     print(e)
-        merchantobj = MerchantCategory.objects.get(merchant='default')
+            created = MerchantCategory.objects.create(
+                                
+                                merchant=merchant,  
+                                category = prediction
+                                )
+            if created:
+                print("A new merchantcategory record was created.")
+                merchantobj = created
+            else:
+                raise RuntimeError("Failed to create new merchantcategory record.")
+        except Exception as e:
+            print(e)
+            merchantobj = MerchantCategory.objects.get(merchant='default')
     
     return merchantobj      
         

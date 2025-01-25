@@ -4,7 +4,7 @@ from django.db import models
 
 class MerchantCategory(models.Model):
     
-    merchant = models.CharField(max_length=50)
+    merchant = models.CharField(max_length=200)
     category = models.CharField(max_length=50)
     
     def __str__(self):
@@ -16,7 +16,7 @@ class Expenses(models.Model):
     cheque_no = models.BigIntegerField(null=True)
     txn_amount = models.DecimalField(max_digits=10, decimal_places=2)
     balance = models.DecimalField(max_digits=10, decimal_places=2)
-    merchant = models.CharField(max_length=50)
+    merchant = models.CharField(max_length=200)
     merchantobject = models.ForeignKey(MerchantCategory,on_delete=models.SET_NULL, null=True)
     
     
