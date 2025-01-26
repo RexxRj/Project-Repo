@@ -9,7 +9,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const balances = JSON.parse(
     document.getElementById("chart-data").dataset.balances
   );
-  const num = JSON.parse(document.getElementById("chart-data").dataset.num);
+
+  const dates = JSON.parse(document.getElementById("chart-data").dataset.dates);
 
   const minValue = Math.min(...balances);
   const maxValue = Math.max(...balances);
@@ -84,10 +85,30 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   });
 
+  function getIsWeek(startDate, endDate) {
+    const diffInMillis = endDate - startDate;
+    const diffInDays = diffInMillis / (1000 * 60 * 60 * 24); // Convert to days
+
+    let isWeek = 1; // Default to showing one label per day
+
+    if (diffInDays > 60) {
+      // For more than 2 months, show monthly intervals
+      isWeek = 0; // Show every month
+    }
+
+    return isWeek;
+  }
+
+  const start = new Date(dates[0]);
+  const end = new Date(dates[dates.length - 1]);
+
+  // Get the step size based on the range
+  const isWeek = getIsWeek(start, end);
+
   const lineChart = new Chart(linectx, {
     type: "line",
     data: {
-      labels: num, // Labels for the X-axis (can be hidden in options)
+      labels: dates, // Labels for the X-axis (can be hidden in options)
       datasets: [
         {
           data: balances, // Data for the chart
@@ -108,7 +129,27 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       scales: {
         x: {
-          display: false, // Hide the X-axis labels
+          display: true, // Show X-axis
+          title: {
+            display: true,
+            text: "Dates",
+          },
+
+          ticks: {
+            maxTicksLimit: 10, // Limit the number of ticks displayed on the X-axis
+            callback: function (value, index, values) {
+              // If the value is a timestamp (in milliseconds), convert it to Date
+
+              const date = new Date(dates[index]); // value is a timestamp
+              if (isWeek) {
+                return date.toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                }); // Convert Date to 'MMM DD'
+              }
+              return date.toISOString().slice(0, 7); // Convert Date to 'YYYY-MM-DD'
+            },
+          },
         },
         y: {
           display: true, // Show the Y-axis

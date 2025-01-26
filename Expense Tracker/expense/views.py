@@ -7,7 +7,7 @@ from django.urls import reverse
 from .process_file import processfile
 from django.db.models import Sum
 import json
-from datetime import datetime
+from datetime import datetime,timedelta
 
 from .models import Expenses, MerchantCategory
 from .forms import AddCategoryForm,EditCategoryForm
@@ -154,21 +154,80 @@ class DashboardView(View):
     
     def get(self,request):
         
-        expense_data = (Expenses.objects.values('merchantobject__category')
+        
+        selected_start_date = request.GET.get('start_date', '')
+        selected_end_date = request.GET.get('end_date', '')
+        
+        # Prepare filter conditions
+        filters = {}
+
+        if selected_start_date:
+            filters['txn_date__gte'] = datetime.strptime(selected_start_date, '%Y-%m-%d')
+        if selected_end_date:
+            filters['txn_date__lte'] = datetime.strptime(selected_end_date, '%Y-%m-%d')
+            
+        
+        expenses = Expenses.objects.all().filter(**filters).order_by('txn_date')
+        start_date = expenses[0].txn_date
+        end_date = expenses[len(expenses)-1].txn_date
+        print(start_date,end_date)
+        
+        
+        
+        expense_data = (expenses.values('merchantobject__category')
         .annotate(total_amount=Sum('txn_amount'))
         .order_by('-total_amount'))
         
-        balance_data = Expenses.objects.values('balance')
+        merchant_data = (expenses.values('merchantobject__category', 'merchantobject__merchant')
+                         .annotate(total_amount=Sum('txn_amount'))
+                         .order_by('total_amount','merchantobject__category'))
+        
+        balance_data = expenses.values('balance')
         
         categories = [item['merchantobject__category'] for item in expense_data if item['total_amount'] < 0]
-        amounts = [-item['total_amount'] for item in expense_data if item['total_amount'] < 0]
-        balances = [item['balance'] for item in balance_data]
-        num = [i for i in range(1,len(balances)+1)]
+        amounts = [round(-item['total_amount'],2) for item in expense_data if item['total_amount'] < 0]
+        balances = [round(item['balance'],2) for item in balance_data]
+        dates = [item['txn_date'].strftime('%Y-%m-%d') for item in expenses.order_by('txn_date').values('txn_date')]
+        
+        total_days = (end_date - start_date).days + 1
+        all_expense = (expenses.exclude(merchantobject__category__iexact='Salary').aggregate(Sum('txn_amount')))
+        datewise_expense = (expenses.exclude(merchantobject__category__iexact='Salary')
+                                    .exclude(merchantobject__category__iexact='Investment')
+                                    .aggregate(Sum('txn_amount')))
+        
+        all_total_expense = round(all_expense['txn_amount__sum'],2)
+        total_date_expense = round(datewise_expense['txn_amount__sum'],2)
+        avg_expense = round(total_date_expense/total_days,2)       
+        
+        print(total_date_expense,avg_expense)
+        
+        
+        merchant_expense_dict = {}
+        
+        for data in merchant_data:
+            
+            cat = data['merchantobject__category']
+            merch = data['merchantobject__merchant']
+            merch_total = data['total_amount']
+            
+            
+            if cat not in merchant_expense_dict:
+                cat_total = [item['total_amount'] for item in expense_data if item['merchantobject__category'] == cat][0]
+                merchant_expense_dict[cat] = {
+                    'merchants': [],
+                    'total_category_amount': round(cat_total,2)  # Initialize total for this category
+                    }
+            
+            merchant_expense_dict[cat]['merchants'].append({
+                'merchant': merch,
+                'total_amount': round(merch_total,2)
+            })
+            
         
         categories = json.dumps(categories)
         amounts = json.dumps([float(amount) for amount in amounts])
         balances = json.dumps([float(balance) for balance in balances])
-        num = json.dumps(num)
+        dates = json.dumps(dates)
 
         
         
@@ -176,7 +235,11 @@ class DashboardView(View):
             "categories": categories,
             "amounts": amounts,
             "balances": balances,
-            "num": num
+            "dates": dates,
+            "merchant_expense_dict": merchant_expense_dict,
+            "total_date_expense": total_date_expense,
+            "all_total_expense": all_total_expense,
+            "avg_expense": avg_expense,
         }
         
         return render(request,"expense/dashboard.html",context)
