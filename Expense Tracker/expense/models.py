@@ -22,4 +22,16 @@ class Expenses(models.Model):
     
     def __str__(self):
         return f"{self.txn_date} - {self.cheque_no}"
+
+class Budget(models.Model):
+    
+    date = models.DateField()
+    essential = models.DecimalField(max_digits=10, decimal_places=2)
+    investment = models.DecimalField(max_digits=10, decimal_places=2)
+    non_essential = models.DecimalField(max_digits=10, decimal_places=2)
+    savings = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    def __str__(self):
+        return f"{self.date}"
+    
     

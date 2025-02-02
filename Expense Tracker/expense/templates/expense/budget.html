@@ -1,0 +1,37 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% block css_files %}
+{% endblock css_files %}
+{% block title %}
+    Budget
+{% endblock title %}
+{% block content %}
+    <section id="budget-view">
+        <h2 style="text-align: center;margin-bottom: 20px;">Budget</h2>
+        <div class="table-responsive">
+            <table class="table table-hover text-center text-nowrap">
+                <thead>
+                    <tr>
+                        <th scope="col">Month</th>
+                        <th scope="col">Essential</th>
+                        <th scope="col">Investments</th>
+                        <th scope="col">Non Essential</th>
+                        <th scope="col">Previous Month Savings</th>
+                    </tr>
+                    {% for row in budget %}
+                        <tr>
+                            <td>{{ row.date|date:"F Y" }}</td>
+                            <td>{{ row.essential }}</td>
+                            <td>{{ row.investment }}</td>
+                            <td>{{ row.non_essential }}</td>
+                            <td>{{ row.savings }}</td>
+                        </tr>
+                    {% endfor %}
+                </thead>
+            </table>
+        </div>
+    </section>
+{% endblock content %}

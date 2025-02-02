@@ -5,6 +5,7 @@ from .models import MerchantCategory,Expenses
 class AddCategoryForm(forms.ModelForm):
     
     new_category = forms.CharField(required=False)
+    action = forms.CharField(widget=forms.HiddenInput(),initial='not_save')
     
     class Meta:
         model = Expenses
@@ -14,8 +15,16 @@ class AddCategoryForm(forms.ModelForm):
     def save(self, commit = True):
         
         new_category = self.cleaned_data.get('new_category')
+        action = self.cleaned_data.get('action')
         
         merchant = self.instance.merchant
+        
+        print('action',action)
+        
+        if action != 'save':
+            merchant = merchant.lower().strip() + ' - ' + new_category.lower().strip()
+        
+        print(merchant,new_category)
         
         if new_category:
             merchant_category,created = MerchantCategory.objects.get_or_create(

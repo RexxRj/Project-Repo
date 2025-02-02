@@ -4,12 +4,13 @@ from django.views.generic import ListView,DetailView
 from django.views import View
 from django.http import HttpResponseRedirect,Http404
 from django.urls import reverse
-from .process_file import processfile
 from django.db.models import Sum
 import json
 from datetime import datetime,timedelta
 
-from .models import Expenses, MerchantCategory
+from .process_file import processfile
+from .budget import budgetCalculation
+from .models import Expenses, MerchantCategory,Budget
 from .forms import AddCategoryForm,EditCategoryForm
 
 class StartingPageView(View):
@@ -119,6 +120,8 @@ class AllTransactionsView(View):
             selected_start_date = request.POST.get('start_date', '')
             selected_end_date = request.POST.get('end_date', '')
             
+            params = {}
+            
             
             
             # Prepare filter conditions
@@ -126,12 +129,16 @@ class AllTransactionsView(View):
 
             if selected_merchant:
                 filters['merchant'] = selected_merchant
+                params['merchant'] = selected_merchant
             if selected_category:
                 filters['merchantobject__category'] = selected_category
+                params['category'] = selected_category
             if selected_start_date:
                 filters['txn_date__gte'] = datetime.strptime(selected_start_date, '%Y-%m-%d')
+                params['start_date'] = selected_start_date
             if selected_end_date:
                 filters['txn_date__lte'] = datetime.strptime(selected_end_date, '%Y-%m-%d')
+                params['end_date'] = selected_end_date
                 
             expense_instance = Expenses.objects.filter(**filters)
             expense_instance.delete()
@@ -139,6 +146,7 @@ class AllTransactionsView(View):
             print('deleted')
             return HttpResponseRedirect(reverse("transactions-page",args=[pageno]))
             
+        print(request.POST['action'])
         expense_instance = Expenses.objects.get(pk=request.POST['pk'])
         category = AddCategoryForm(request.POST,instance=expense_instance)
         
@@ -146,6 +154,7 @@ class AllTransactionsView(View):
             category.save(commit=True)
             
         print(category.errors)
+
         return HttpResponseRedirect(reverse("transactions-page",args=[pageno]))
             
     
@@ -253,7 +262,7 @@ class CategoriesView(View):
         if pageno==None:
             return HttpResponseRedirect(reverse("categories-page",args=[1]))
         
-        categories = MerchantCategory.objects.all()
+        categories = MerchantCategory.objects.all().order_by('merchant')
         total_txns = len(categories)
         lastpage = int(total_txns/20)
         
@@ -295,7 +304,7 @@ class CategoriesView(View):
             if default_merchantobj:
                 Expenses.objects.filter(merchantobject=instance).update(merchantobject=default_merchantobj)
             instance.delete()
-            return HttpResponseRedirect(reverse("categories-page"))
+            return HttpResponseRedirect(reverse("categories-page",args=[pageno]))
         
         categoryform = EditCategoryForm(request.POST)
 
@@ -305,6 +314,24 @@ class CategoriesView(View):
 
         
         return HttpResponseRedirect(reverse("categories-page",args=[pageno]))
+
+class BudgetCalculatorView(View):
+    
+    def get(self,request):
+        
+        budgetCalculation()
+        
+        budget = Budget.objects.all().order_by('-date')
+        budegt = budget[0]
+        
+        return render(request,'expense/budget.html',{
+            'budget': budget
+            })
+
+class AboutPageView(View):
+    
+    def get(self,request):
+        return render(request,'base/about.html')
         
         
             

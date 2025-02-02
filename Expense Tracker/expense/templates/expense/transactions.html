@@ -88,6 +88,7 @@
                         <th scope="col">Amount</th>
                         <th scope="col">Balance</th>
                         <th scope="col">Category</th>
+                        <th scope="col"></th>
                     </tr>
                     {% for row in transactions %}
                         <tr>
@@ -147,6 +148,17 @@
                                         </li>
                                     </ul>
                                 </div>
+                            </td>
+                            <td>
+                                <form action="{% url "transactions-page" pageno %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="pk" value="{{ row.id }}">
+                                    <input type="hidden"
+                                           name="new_category"
+                                           value="{{ row.merchantobject.category }}">
+                                    <input type="hidden" name="action" value="save">
+                                    <button type="submit" class="btn btn-primary">Save All</button>
+                                </form>
                             </td>
                         </tr>
                     {% endfor %}

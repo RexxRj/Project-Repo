@@ -9,5 +9,7 @@ urlpatterns = [
     path('transactions/<int:pageno>',views.AllTransactionsView.as_view(),name='transactions-page'),
     path('dashboard/',views.DashboardView.as_view(),name='dashboard-page'),
     path('categories/',views.CategoriesView.as_view(),name='categories-page-default'),
-    path('categories/<int:pageno>',views.CategoriesView.as_view(),name='categories-page')
+    path('categories/<int:pageno>',views.CategoriesView.as_view(),name='categories-page'),
+    path('budget/',views.BudgetCalculatorView.as_view(),name='budget-page'),
+    path('about/',views.AboutPageView.as_view(),name='about-page'),
 ]
