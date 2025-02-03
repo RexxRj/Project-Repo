@@ -13,8 +13,8 @@ const DUMMY_PLACES = [
     address: "Ulubari, Sarania Hills, Guwahati, Assam 781007",
     creator: "u1",
     location: {
-      lat: "26.1736296",
-      lng: "91.7525178",
+      lat: "26.177389",
+      lng: "91.768175",
     },
   },
   {
