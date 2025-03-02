@@ -1,9 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-routes");
 const HttpError = require("./models/http-error");
+
+const url =
+  "mongodb+srv://rexxogrator:GxlP4dyJdrma615a@cluster0.0tevh.mongodb.net/places?retryWrites=true&w=majority&appName=Cluster0";
 
 const app = express();
 
@@ -26,4 +30,12 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An unknown error occurred!" });
 });
 
-app.listen(5000);
+mongoose
+  .connect(url)
+  .then(() => {
+    console.log("Connected to the database!");
+    app.listen(5000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
