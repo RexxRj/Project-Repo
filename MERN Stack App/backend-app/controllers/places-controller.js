@@ -1,4 +1,5 @@
-const { v4: uuidv4 } = require("uuid");
+const fs = require("fs");
+
 const { validationResult } = require("express-validator");
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
@@ -83,8 +84,7 @@ const createPlace = async (req, res, next) => {
     address,
     creator,
     location: coordinates,
-    image:
-      "https://lh5.googleusercontent.com/p/AF1QipMQvrztkdR0Vik0sgsXkb0zzhFYx5o11CUcUNGU=w408-h306-k-no",
+    image: req.file.path,
   });
 
   let user;
@@ -172,6 +172,8 @@ const deletePlace = async (req, res, next) => {
     return next(new HttpError("Could not find place for this id.", 404));
   }
 
+  const imagePath = place.image;
+
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
@@ -186,6 +188,10 @@ const deletePlace = async (req, res, next) => {
     );
     return next(error);
   }
+
+  fs.unlink(imagePath, (err) => {
+    console.log(err);
+  });
 
   res.status(200).json({ message: "Deleted place." });
 };
