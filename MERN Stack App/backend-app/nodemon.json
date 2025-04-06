@@ -1,0 +1,9 @@
+{
+    "env": {
+        "DB_USER": "rexxogrator",
+        "DB_PASSWORD": "GxlP4dyJdrma615a",
+        "JWT_KEY": "jwt_dev_key",
+        "DB_NAME": "mern"
+        
+    }
+}

@@ -9,8 +9,7 @@ const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-routes");
 const HttpError = require("./models/http-error");
 
-const url =
-  "mongodb+srv://rexxogrator:GxlP4dyJdrma615a@cluster0.0tevh.mongodb.net/mern?retryWrites=true&w=majority&appName=Cluster0";
+const url = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.0tevh.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority&appName=Cluster0`;
 
 const app = express();
 
@@ -55,7 +54,7 @@ mongoose
   .connect(url)
   .then(() => {
     console.log("Connected to the database!");
-    app.listen(5000);
+    app.listen(process.env.PORT || 5000);
   })
   .catch((err) => {
     console.log(err);
